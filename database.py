@@ -10,6 +10,7 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 
+# DATABASE USER
 
 class User(db.Model):
     __tablename__ = "users"
@@ -25,6 +26,7 @@ class User(db.Model):
     teacher = relationship("Teacher", back_populates="user", uselist=False)
     manager = relationship("Manager", back_populates="user", uselist=False)
 
+# DATABASE TEACHER
 
 class Teacher(db.Model):
     __tablename__ = "teachers"
@@ -40,6 +42,7 @@ class Teacher(db.Model):
     students = relationship("Student", back_populates="teacher")
     manager = relationship("Manager", back_populates="teachers")
 
+# DATABASE STUDENT
 
 class Student(db.Model):
     __tablename__ = "students"
@@ -58,6 +61,7 @@ class Student(db.Model):
     teacher = relationship("Teacher", back_populates="students")
     manager = relationship("Manager", back_populates="students")
     
+# DATABASE MANAGER
 
 class Manager(db.Model):
     __tablename__ = "managers"
