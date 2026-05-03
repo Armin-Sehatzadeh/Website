@@ -23,6 +23,7 @@ class User(db.Model):
 
     student = relationship("Student", back_populates="user", uselist=False)
     teacher = relationship("Teacher", back_populates="user", uselist=False)
+    manager = relationship("Manager", back_populates="user", uselist=False)
 
 
 class Teacher(db.Model):
@@ -30,12 +31,14 @@ class Teacher(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True, nullable=False)
+    manager_id: Mapped[int] = mapped_column(ForeignKey("managers.id"))
     phone_number: Mapped[str] = mapped_column(String(20))
     birth_date: Mapped[date] = mapped_column(Date)
     address: Mapped[str] = mapped_column(String(255))
 
     user = relationship("User", back_populates="teacher")
     students = relationship("Student", back_populates="teacher")
+    manager = relationship("Manager", back_populates="teachers")
 
 
 class Student(db.Model):
@@ -44,6 +47,7 @@ class Student(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True, nullable=False)
     teacher_id: Mapped[int] = mapped_column(ForeignKey("teachers.id"))
+    manager_id: Mapped[int] = mapped_column(ForeignKey("managers.id"))
     phone_number: Mapped[str] = mapped_column(String(20))
     birth_date: Mapped[date] = mapped_column(Date)
     address: Mapped[str] = mapped_column(String(255))
@@ -52,3 +56,18 @@ class Student(db.Model):
 
     user = relationship("User", back_populates="student")
     teacher = relationship("Teacher", back_populates="students")
+    manager = relationship("Manager", back_populates="students")
+    
+
+class Manager(db.Model):
+    __tablename__ = "managers"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True, nullable=False)
+    phone_number: Mapped[str] = mapped_column(String(20))
+    birth_date: Mapped[date] = mapped_column(Date)
+    address: Mapped[str] = mapped_column(String(255))
+    
+    user = relationship("User", back_populates="manager")
+    teachers = relationship("Teacher", back_populates="manager")
+    students = relationship("Student", back_populates="manager")
