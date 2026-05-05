@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
-from database import db, User, Manager, Teacher, Student
+from database import db, User, Manager, Teacher, Student, TokenBlocklist
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 
 api_bp = Blueprint("api", __name__)
 
@@ -194,3 +194,22 @@ def sign_in_api():
             "role": new_user.role
         }
     }), 201
+   
+    
+@api_bp.post("/logout")
+@jwt_required()
+def logout_api():
+
+    jti = get_jwt()["jti"]
+
+    blocked_token = TokenBlocklist(jti=jti)
+    db.session.add(blocked_token)
+    db.session.commit()
+
+    return jsonify({
+        "status": "successful",
+        "msg": "Logged out successfully."
+    }), 200
+
+    
+    

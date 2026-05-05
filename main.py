@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from database import db
+from database import db, TokenBlocklist
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
@@ -29,6 +29,14 @@ def sign_page():
     return render_template("Sign_in.html")
 
 
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(jwt_header, jwt_payload):
+    jti = jwt_payload["jti"]
+    token = db.session.execute(
+        db.select(TokenBlocklist).where(TokenBlocklist.jti == jti)
+    ).scalar_one_or_none()
+
+    return token is not None
 
 if __name__ == "__main__":
     app.run(debug=True)
