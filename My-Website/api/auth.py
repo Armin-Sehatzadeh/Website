@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from database import db, User, Manager, Teacher, Student
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
+from flask_jwt_extended import create_access_token
 
 api_bp = Blueprint("api", __name__)
 
@@ -66,11 +67,13 @@ def login_api():
             "status": "fail",
             "msg": "Email or password is incorrect."
         }), 401
-
+        
+    access_token = create_access_token(identity=user.id)
 
     return jsonify({
     "status": "successful",
     "msg": "Logged in.",
+    "token": access_token,
     "user": {
         "id": user.id,
         "email": user.email,
@@ -191,6 +194,3 @@ def sign_in_api():
             "role": new_user.role
         }
     }), 201
-    
-
-    
