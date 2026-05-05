@@ -210,6 +210,3 @@ def logout_api():
         "status": "successful",
         "msg": "Logged out successfully."
     }), 200
-
-    
-    
