@@ -195,7 +195,7 @@ def sign_in_api():
         }
     }), 201
    
-    
+# LOGOUT API
 @api_bp.post("/logout")
 @jwt_required()
 def logout_api():
