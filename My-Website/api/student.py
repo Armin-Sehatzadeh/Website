@@ -31,7 +31,7 @@ def get_score():
     }), 200
 
 
-# STUDENT PROFILE
+# STUDENT PROFILE INFO
 @student_bp.get("/profile")
 @jwt_required()
 @role_required("student")

@@ -71,7 +71,7 @@ def login_api():
     access_token = create_access_token(identity=user.id)
 
     return jsonify({
-    "status": "successful",
+    "status": "success",
     "msg": "Logged in.",
     "token": access_token,
     "user": {
@@ -184,7 +184,7 @@ def sign_in_api():
     db.session.commit()
     
     return jsonify({
-        "status": "successful",
+        "status": "success",
         "msg": f"{role} created successfully.",
         "user": {
             "id": new_user.id,
@@ -207,6 +207,6 @@ def logout_api():
     db.session.commit()
 
     return jsonify({
-        "status": "successful",
+        "status": "success",
         "msg": "Logged out successfully."
     }), 200

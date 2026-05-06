@@ -31,3 +31,46 @@ def teacher_profile():
         "address": teacher.address,
     }), 200
     
+
+# EDIT TEACHER PROFILE    
+@teacher_bp.patch("/profile")
+@jwt_required()
+@role_required("teacher")
+def edit_profile():
+    
+    user_id = get_jwt_identity()
+    data = request.get_json() or {}
+    
+    teacher = db.session.execute(
+        db.select(teacher).where(teacher.user_id == user_id)
+        ).scalar_one_or_none()
+    
+    if not teacher:
+        return jsonify({
+            "status": "fail",
+            "msg": "teacher not found"            
+        }), 404
+
+    allowed_fields = [
+        "phone_number",
+        "birth_date",
+        "address",
+    ]
+
+    for field in allowed_fields:
+        if field in data:
+
+            if data[field] is None or str(data[field]).strip() == "":
+                return jsonify({
+                    "status": "fail",
+                    "msg": f"{field} cannot be empty".title()
+                }), 400
+
+            setattr(teacher, field, data[field])
+
+    db.session.commit()
+    
+    return jsonify({
+        "status": "success",
+        "msg": "Profile updated successfully"
+    }), 200
