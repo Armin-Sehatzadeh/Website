@@ -6,210 +6,177 @@ from decorators import role_required
 teacher_bp = Blueprint("teacher_bp", __name__, url_prefix="/api/teacher")
 
 
-# TEACHER PROFILE INFO
+def get_current_teacher():
+    user_id = get_jwt_identity()
+    teacher = db.session.execute(
+        db.select(Teacher).where(Teacher.user_id == user_id)
+    ).scalar_one_or_none()
+
+    return teacher
+
+
+def get_student(student_id):
+    return db.session.execute(
+        db.select(Student).where(Student.id == student_id)
+    ).scalar_one_or_none()
+
+
+def check_score(score):
+    if score is None:
+        return jsonify({"status": "fail", "msg": "Score required"}), 400
+
+    if not (0 <= score <= 20):
+        return jsonify({
+            "status": "fail",
+            "msg": "Score must be between 0 and 20."
+        }), 400
+
+
+def validate_teacher_student(teacher, student):
+    if not teacher:
+        return jsonify({"status": "fail", "msg": "Teacher not found"}), 404
+
+    if not student:
+        return jsonify({"status": "fail", "msg": "Student not found"}), 404
+
+    if student.teacher_id != teacher.id:
+        return jsonify({"status": "fail", "msg": "Not your student"}), 403
+    
+
+# TEACHER PROFILE
 @teacher_bp.get("/profile")
 @jwt_required()
 @role_required("teacher")
 def teacher_profile():
-    
-    user_id = get_jwt_identity()
-    teacher = db.session.execute(
-        db.select(Teacher).where(Teacher.user_id == user_id)
-        ).scalar_one_or_none() 
-    
+
+    teacher = get_current_teacher()
+
     if not teacher:
-        return jsonify({
-            "status": "fail",
-            "msg": "Teacher not found"            
-        }), 404
+        return jsonify({"status": "fail", "msg": "Teacher not found"}), 404
 
     return jsonify({
-        "first_name": teacher.first_name,
-        "last_name": teacher.last_name,       
+        "first_name": teacher.user.first_name,
+        "last_name": teacher.user.last_name,
         "phone_number": teacher.phone_number,
         "birth_date": teacher.birth_date,
         "address": teacher.address,
     }), 200
-    
 
-# EDIT TEACHER PROFILE    
+
+# EDIT PROFILE
 @teacher_bp.patch("/profile")
 @jwt_required()
 @role_required("teacher")
 def edit_profile():
-    
-    user_id = get_jwt_identity()
-    data = request.get_json() or {}
-    
-    teacher = db.session.execute(
-        db.select(teacher).where(teacher.user_id == user_id)
-        ).scalar_one_or_none()
-    
+
+    teacher = get_current_teacher()
     if not teacher:
-        return jsonify({
-            "status": "fail",
-            "msg": "teacher not found"            
-        }), 404
+        return jsonify({"status": "fail", "msg": "Teacher not found"}), 404
 
-    allowed_fields = [
-        "phone_number",
-        "birth_date",
-        "address",
-    ]
+    data = request.get_json() or {}
 
-    for field in allowed_fields:
-        if field in data:
+    allowed = ["phone_number", "birth_date", "address"]
 
-            if data[field] is None or str(data[field]).strip() == "":
-                return jsonify({
-                    "status": "fail",
-                    "msg": f"{field} cannot be empty".title()
-                }), 400
-
+    for field in allowed:
+        if field in data and data[field]:
             setattr(teacher, field, data[field])
 
     db.session.commit()
-    
-    return jsonify({
-        "status": "success",
-        "msg": "Profile updated successfully"
-    }), 200
-    
+    return jsonify({"status": "success", "msg": "Profile updated"}), 200
 
-# TEACHERS STUDENTS
+
+# GET STUDENTS
 @teacher_bp.get("/students")
 @jwt_required()
 @role_required("teacher")
 def get_students():
 
-    user_id = get_jwt_identity()
-
-    teacher = db.session.execute(
-        db.select(Teacher).where(Teacher.user_id == user_id)
-    ).scalar_one_or_none()
-
+    teacher = get_current_teacher()
     if not teacher:
-        return jsonify({
-            "status": "fail",
-            "msg": "Teacher not found"
-        }), 404
-    
-    users = db.session.execute(
-    db.select(Student).where(Student.teacher_id == user_id)
+        return jsonify({"status": "fail", "msg": "Teacher not found"}), 404
+
+    students = db.session.execute(
+        db.select(Student).where(Student.teacher_id == teacher.id)
     ).scalars().all()
-    
-    students = []
 
-    for user in users:
-        students.append({
-            "id": user.id,
-            "name": f"{user.user.first_name} {user.user.last_name}",
-            "grade_level": user.grade_level,
-            "score": user.score
+    students_list = []
+    for s in students:
+        students_list.append({
+            "id": s.id,
+            "name": f"{s.user.first_name} {s.user.last_name}",
+            "grade_level": s.grade_level,
+            "score": s.score
         })
-        
-    return jsonify({
-        "status": "success",
-        "students": students
-    }), 200
+
+    return jsonify({"status": "success", "students": students_list}), 200
 
 
-# SET STUDENT SCORE
+# SET SCORE
 @teacher_bp.post("/score/<int:student_id>")
 @jwt_required()
 @role_required("teacher")
 def set_score(student_id):
-    
+
     data = request.get_json() or {}
     score = data.get("score")
-    
-    if score is None:
-        return jsonify({
-            "status": "fail",
-            "msg": "Score required"
-        }), 400
-    
-    user_id = get_jwt_identity()
 
-    teacher = db.session.execute(
-        db.select(Teacher).where(Teacher.user_id == user_id)
-    ).scalar_one_or_none()
-    
-    if not teacher:
-        return jsonify({
-            "status": "fail",
-            "msg": "Teacher not found."
-        }), 404
-    
-    student = db.session.execute(
-        db.select(Student).where(Student.id == student_id)
-    ).scalar_one_or_none()
-    
-    if not student:
-        return jsonify({
-            "status": "fail",
-            "msg": "Student not found."
-        }), 404
-    
-    if student.teacher_id != teacher.id:
-        return jsonify({
-            "status": "fail",
-            "msg": "Not your student."
-        }), 403
+    err = check_score(score)
+    if err:
+        return err
+
+    teacher = get_current_teacher()
+    student = get_student(student_id)
+
+    err = validate_teacher_student(teacher, student)
+    if err:
+        return err
 
     student.score = score
     db.session.commit()
 
-    return jsonify({
-        "status": "success",
-        "msg": "Score set"
-    }), 200
+    return jsonify({"status": "success", "msg": "Score set"}), 200
 
 
-# EDIT STUDENT SCORE
+# EDIT SCORE
 @teacher_bp.patch("/score/<int:student_id>")
 @jwt_required()
 @role_required("teacher")
 def edit_score(student_id):
-    
-    user_id = get_jwt_identity()
-    
+
     data = request.get_json() or {}
     score = data.get("score")
 
-    if score is None:
-        return jsonify({"status": "fail", "msg": "Score required"}), 400
-    
-    teacher = db.session.execute(
-        db.select(Teacher).where(Teacher.user_id == user_id)
-        ).scalar_one_or_none()
-    
-    if not teacher:
-        return jsonify({
-            "status": "fail",
-            "msg": "Teacher not found."
-        })
-    
-    student = db.session.execute(
-        db.select(Student).where(Student.id == student_id)
-        ).scalar_one_or_none()
-    
-    if not student:
-        return jsonify({
-            "status": "fail",
-            "msg": "Student not found."
-        }), 404
-    
-    if student.teacher_id != teacher.id:
-        return jsonify({
-            "status": "fail",
-            "msg": "Not your student."
-        }), 403
+    err = check_score(score)
+    if err:
+        return err
+
+    teacher = get_current_teacher()
+    student = get_student(student_id)
+
+    err = validate_teacher_student(teacher, student)
+    if err:
+        return err
 
     student.score = score
     db.session.commit()
 
-    return jsonify({
-        "status": "success",
-        "msg": "Score updated"
-    }), 200
+    return jsonify({"status": "success", "msg": "Score updated"}), 200
+
+
+# DELETE SCORE
+@teacher_bp.delete("/score/<int:student_id>")
+@jwt_required()
+@role_required("teacher")
+def delete_score(student_id):
+
+    teacher = get_current_teacher()
+    student = get_student(student_id)
+
+    err = validate_teacher_student(teacher, student)
+    if err:
+        return err
+
+    student.score = None
+    db.session.commit()
+
+    return jsonify({"status": "success", "msg": "Score deleted"}), 200
