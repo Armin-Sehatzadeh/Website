@@ -111,4 +111,37 @@ def get_students():
     }), 200
 
 
+# SET SCORE
+@teacher_bp.post("/score/<int:student_id>")
+@jwt_required()
+@role_required("teacher")
+def set_score(student_id):
+    
+    data = request.get_json() or {}
+    score = data.get("score")
+    
+    if score is None:
+        return jsonify({"status": "fail", "msg": "Score required"}), 400
+    
+    user_id = get_jwt_identity()
+
+    teacher = db.session.execute(
+        db.select(Teacher).where(Teacher.user_id == user_id)
+    ).scalar_one_or_none()
+    
+    student = db.session.execute(
+        db.select(Student).where(Student.id == student_id)
+    ).scalar_one_or_none()
+    
+    if not student:
+        return jsonify({"status": "fail", "msg": "Student not found"}), 404
+    
+    if student.teacher_id != teacher.id:
+        return jsonify({"status": "fail", "msg": "Not your student"}), 403
+
+    student.score = score
+    db.session.commit()
+
+    return jsonify({"status": "success", "msg": "Score set"}), 200
+
     
