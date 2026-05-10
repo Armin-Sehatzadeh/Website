@@ -75,3 +75,33 @@ def edit_teacher(teacher_id):
 
     db.session.commit()
     return jsonify({"msg": "Teacher updated"}), 200
+
+
+# EDIT STUDENT PROFILE
+@manager_bp.patch("/student/<int:student_id>")
+@jwt_required()
+@role_required("manager")
+def edit_student(student_id):
+
+    student = db.session.get(Student, student_id)
+
+    if not student:
+        return jsonify({"msg": "Student not found"}), 404
+
+    data = request.get_json()
+
+    allowed = [
+        "phone_number",
+        "birth_date",
+        "address",
+        "grade_level",
+        "score"
+    ]
+
+    for field in allowed:
+        if field in data:
+            setattr(student, field, data[field])
+
+    db.session.commit()
+
+    return jsonify({"msg": "Student updated"}), 200
