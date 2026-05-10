@@ -31,4 +31,27 @@ def manager_profile():
         "birth_date": str(manager.birth_date)
     }), 200
 
+
+# EDIT MANAGER PROFILE
+@manager_bp.patch("/profile")
+@jwt_required()
+@role_required("manager")
+def edit_profile():
+    
+    manager = get_current_manager()
+    if not manager:
+        return jsonify({"msg": "Manager not found"}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"msg": "Data not found"}), 400
+    
+    allowed = ["phone_number", "address"]
+
+    for field in allowed:
+        if field in data:
+            setattr(manager, field, data[field])
+
+    db.session.commit()
+    return jsonify({"msg": "Profile updated"}), 200
     
