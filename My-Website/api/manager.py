@@ -105,3 +105,25 @@ def edit_student(student_id):
     db.session.commit()
 
     return jsonify({"msg": "Student updated"}), 200
+
+
+# ASSIGN STUDENT TO TEACHER
+@manager_bp.post("/assign-student")
+@jwt_required()
+@role_required("manager")
+def assign_student():
+
+    data = request.get_json()
+
+    student = db.session.get(Student, data.get("student_id"))
+    teacher = db.session.get(Teacher, data.get("teacher_id"))
+
+    if not student or not teacher:
+        return jsonify({"msg": "Student or Teacher not found"}), 404
+
+    student.teacher_id = teacher.id
+
+    db.session.commit()
+
+    return jsonify({"msg": "Student assigned"}), 200
+
