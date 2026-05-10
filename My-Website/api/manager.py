@@ -146,10 +146,32 @@ def get_students():
             "id": s.id,
             "first_name": s.user.first_name,
             "last_name": s.user.last_name,
-            "phone": s.user.phone,
+            "phone": s.phone,
             "grade": s.grade,
             "score": s.score,
             "teacher_id": s.teacher_id
         })
 
     return jsonify(result), 200
+
+
+# GET TEACHER LIST
+@manager_bp.get("/teachers")
+@jwt_required()
+@role_required("manager")
+def get_teachers():
+    teachers = Teacher.query.all()
+
+    result = []
+    for t in teachers:
+        result.append({
+            "id": t.id,
+            "first_name": t.user.first_name,
+            "last_name": t.user.last_name,
+            "phone": t.phone,
+            "students_count": len(t.students)
+        })
+
+    return jsonify(result), 200
+
+
