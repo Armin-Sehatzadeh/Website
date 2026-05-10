@@ -67,6 +67,9 @@ def edit_teacher(teacher_id):
         return jsonify({"msg": "Teacher not found"}), 404
     
     data = request.get_json()
+    if not data:
+        return jsonify({"msg": "No data provided"}), 400
+
     allowed = ["phone_number", "address"]
 
     for field in allowed:
@@ -89,6 +92,8 @@ def edit_student(student_id):
         return jsonify({"msg": "Student not found"}), 404
 
     data = request.get_json()
+    if not data:
+        return jsonify({"msg": "No data provided"}), 400
 
     allowed = [
         "phone_number",
