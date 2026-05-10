@@ -132,3 +132,24 @@ def assign_student():
 
     return jsonify({"msg": "Student assigned"}), 200
 
+
+# GET STUDENTS LIST
+@manager_bp.get("/students")
+@jwt_required()
+@role_required("manager")
+def get_students():
+    students = Student.query.all()
+
+    result = []
+    for s in students:
+        result.append({
+            "id": s.id,
+            "first_name": s.user.first_name,
+            "last_name": s.user.last_name,
+            "phone": s.user.phone,
+            "grade": s.grade,
+            "score": s.score,
+            "teacher_id": s.teacher_id
+        })
+
+    return jsonify(result), 200
