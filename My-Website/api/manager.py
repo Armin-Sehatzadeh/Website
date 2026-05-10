@@ -13,4 +13,22 @@ def get_current_manager():
         ).scalar_one_or_none()
 
 
+# MANAGER PROFILE
+@manager_bp.get("/profile")
+@jwt_required()
+@role_required("manager")
+def manager_profile():
+    
+    manager = get_current_manager()
+    if not manager:
+        return jsonify({"msg": "Manager not found"}), 404
+
+    return jsonify({
+        "first_name": manager.user.first_name,
+        "last_name": manager.user.last_name,
+        "phone_number": manager.phone_number,
+        "address": manager.address,
+        "birth_date": str(manager.birth_date)
+    }), 200
+
     

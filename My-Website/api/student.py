@@ -52,7 +52,7 @@ def student_profile():
         "first_name": student.first_name,
         "last_name": student.last_name,       
         "phone_number": student.phone_number,
-        "birth_date": student.birth_date,
+        "birth_date": str(student.birth_date),
         "address": student.address,
         "grade_level": student.grade_level,
         "score": student.score

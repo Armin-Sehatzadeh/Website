@@ -58,7 +58,7 @@ def teacher_profile():
         "first_name": teacher.user.first_name,
         "last_name": teacher.user.last_name,
         "phone_number": teacher.phone_number,
-        "birth_date": teacher.birth_date,
+        "birth_date": str(teacher.birth_date),
         "address": teacher.address,
     }), 200
 
