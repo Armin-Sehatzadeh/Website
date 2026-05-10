@@ -54,4 +54,24 @@ def edit_profile():
 
     db.session.commit()
     return jsonify({"msg": "Profile updated"}), 200
+
+
+# EDIT TEACHER PROFILE
+@manager_bp.patch("/teacher/<int:teacher_id>")
+@jwt_required()
+@role_required("manager")
+def edit_teacher(teacher_id):
+
+    teacher = db.session.get(Teacher, teacher_id)
+    if not teacher:
+        return jsonify({"msg": "Teacher not found"}), 404
     
+    data = request.get_json()
+    allowed = ["phone_number", "address"]
+
+    for field in allowed:
+        if field in data:
+            setattr(teacher, field, data[field])
+
+    db.session.commit()
+    return jsonify({"msg": "Teacher updated"}), 200
