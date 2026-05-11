@@ -155,6 +155,7 @@ def get_students():
     return jsonify(result), 200
 
 
+
 # GET TEACHER LIST
 @manager_bp.get("/teachers")
 @jwt_required()
