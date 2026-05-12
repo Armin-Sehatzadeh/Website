@@ -49,8 +49,8 @@ class Student(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True, nullable=False)
-    teacher_id: Mapped[int] = mapped_column(ForeignKey("teachers.id"))
-    manager_id: Mapped[int] = mapped_column(ForeignKey("managers.id"))
+    teacher_id: Mapped[int] = mapped_column(ForeignKey("teachers.id"), nullable=True)
+    manager_id: Mapped[int] = mapped_column(ForeignKey("managers.id"), nullable=True)
     phone_number: Mapped[str] = mapped_column(String(20))
     birth_date: Mapped[date] = mapped_column(Date)
     address: Mapped[str] = mapped_column(String(255))

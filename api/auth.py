@@ -3,6 +3,7 @@ from database import db, User, Manager, Teacher, Student, TokenBlocklist
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt
+from datetime import datetime
 
 auth_bp = Blueprint("auth_bp", __name__)
 
@@ -68,7 +69,7 @@ def login_api():
             "msg": "Email or password is incorrect."
         }), 401
         
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
 
     return jsonify({
     "status": "success",
@@ -89,50 +90,63 @@ def login_api():
 def sign_in_api():
     data = request.json
     roles = ["student", "teacher", "manager"]
-    
+
     first_name = data.get("first_name")
     last_name = data.get("last_name")
     role = data.get("role")
     email = data.get("email")
     password = data.get("password")
-    
+
     phone_number = data.get("phone_number")
     birth_date = data.get("birth_date")
     address = data.get("address")
     grade_level = data.get("grade_level")
     score = data.get("score")
-    
+
     if not first_name or not last_name or not role or not email or not password:
         return jsonify({
             "status": "fail",
             "msg": "fields must not be empty"
         }), 400
-    
+
     if role not in roles:
         return jsonify({
             "status": "fail",
             "msg": "enter correct role."
         }), 400
-    
+
     if not check_password_format(password):
         return jsonify({
             "status": "fail",
             "msg": "Password must contain capital letter, small letter, number and special character."
         }), 400
-    
+
     if not check_email_format(email):
         return jsonify({
             "status": "fail",
             "msg": "Invalid email format."
         }), 400
-    
+
     if role == "student" and not grade_level:
         return jsonify({
             "status": "fail",
             "msg": "grade_level is required for students."
         }), 400
-    
-    existing_user = db.session.execute(db.select(User).where(User.email == email)).scalar_one_or_none()
+
+    birth_date_obj = None
+    if birth_date:
+        try:
+            birth_date_obj = datetime.strptime(birth_date, "%Y-%m-%d").date()
+        except ValueError:
+            return jsonify({
+                "status": "fail",
+                "msg": "birth_date must be in YYYY-MM-DD format."
+            }), 400
+
+    existing_user = db.session.execute(
+        db.select(User).where(User.email == email)
+    ).scalar_one_or_none()
+
     if existing_user:
         return jsonify({
             "status": "fail",
@@ -140,7 +154,7 @@ def sign_in_api():
         }), 409
 
     hashed_password = generate_password_hash(password)
-    
+
     new_user = User(
         first_name=first_name,
         last_name=last_name,
@@ -148,41 +162,41 @@ def sign_in_api():
         email=email,
         password=hashed_password
     )
-    
+
     db.session.add(new_user)
     db.session.flush()
-    
+
     if role == "student":
         student = Student(
             user_id=new_user.id,
             phone_number=phone_number,
-            birth_date=birth_date,
+            birth_date=birth_date_obj,
             address=address,
             score=score,
             grade_level=grade_level
         )
         db.session.add(student)
-        
+
     elif role == "teacher":
         teacher = Teacher(
             user_id=new_user.id,
             phone_number=phone_number,
-            birth_date=birth_date,
+            birth_date=birth_date_obj,
             address=address
         )
         db.session.add(teacher)
-        
+
     elif role == "manager":
         manager = Manager(
             user_id=new_user.id,
             phone_number=phone_number,
-            birth_date=birth_date,
+            birth_date=birth_date_obj,
             address=address
         )
         db.session.add(manager)
-    
+
     db.session.commit()
-    
+
     return jsonify({
         "status": "success",
         "msg": f"{role} created successfully.",
