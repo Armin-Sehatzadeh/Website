@@ -174,5 +174,3 @@ def get_teachers():
         })
 
     return jsonify(result), 200
-
-
