@@ -146,8 +146,8 @@ def get_students():
             "id": s.id,
             "first_name": s.user.first_name,
             "last_name": s.user.last_name,
-            "phone": s.phone,
-            "grade": s.grade,
+            "phone": s.phone_number,
+            "grade": s.grade_level,
             "score": s.score,
             "teacher_id": s.teacher_id
         })
@@ -169,7 +169,7 @@ def get_teachers():
             "id": t.id,
             "first_name": t.user.first_name,
             "last_name": t.user.last_name,
-            "phone": t.phone,
+            "phone": t.phone_number,
             "students_count": len(t.students)
         })
 
