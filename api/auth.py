@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 
-api_bp = Blueprint("api", __name__)
+auth_bp = Blueprint("auth_bp", __name__)
 
 
 # CHECK PASSWORD
@@ -37,7 +37,7 @@ def check_email_format(email):
 
 
 # LOGIN API
-@api_bp.post("/login")
+@auth_bp.post("/login")
 def login_api():
     data = request.json
 
@@ -85,7 +85,7 @@ def login_api():
 
 
 # SIGN-IN API
-@api_bp.post("/sign-in")
+@auth_bp.post("/sign-in")
 def sign_in_api():
     data = request.json
     roles = ["student", "teacher", "manager"]
@@ -196,7 +196,7 @@ def sign_in_api():
     }), 201
    
 # LOGOUT API
-@api_bp.post("/logout")
+@auth_bp.post("/logout")
 @jwt_required()
 def logout_api():
 
