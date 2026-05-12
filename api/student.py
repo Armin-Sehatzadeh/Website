@@ -24,8 +24,8 @@ def get_score():
         }), 404
 
     return jsonify({
-        "first_name": student.first_name,
-        "last_name": student.last_name,
+        "first_name": student.user.first_name,
+        "last_name": student.user.last_name,
         "score": student.score,
         "grade_level": student.grade_level
     }), 200
@@ -49,8 +49,8 @@ def student_profile():
         }), 404
 
     return jsonify({
-        "first_name": student.first_name,
-        "last_name": student.last_name,       
+        "first_name": student.user.first_name,
+        "last_name": student.user.last_name,       
         "phone_number": student.phone_number,
         "birth_date": str(student.birth_date),
         "address": student.address,
