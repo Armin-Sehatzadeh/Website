@@ -102,6 +102,8 @@ def sign_in_api():
     address = data.get("address")
     grade_level = data.get("grade_level")
     score = data.get("score")
+    
+    manager_id = data.get("manager_id")
 
     if not first_name or not last_name or not role or not email or not password:
         return jsonify({
@@ -131,6 +133,12 @@ def sign_in_api():
         return jsonify({
             "status": "fail",
             "msg": "grade_level is required for students."
+        }), 400
+        
+    if role == "teacher" and not manager_id:
+        return jsonify({
+            "status": "fail",
+            "msg": "manager_id is required for teachers."
         }), 400
 
     birth_date_obj = None
@@ -179,10 +187,11 @@ def sign_in_api():
 
     elif role == "teacher":
         teacher = Teacher(
-            user_id=new_user.id,
-            phone_number=phone_number,
-            birth_date=birth_date_obj,
-            address=address
+        user_id=new_user.id,
+        manager_id=manager_id,
+        phone_number=phone_number,
+        birth_date=birth_date_obj,
+        address=address
         )
         db.session.add(teacher)
 
