@@ -64,18 +64,24 @@ def student_profile():
 @jwt_required()
 @role_required("student")
 def edit_profile():
-    
+
     user_id = get_jwt_identity()
     data = request.get_json() or {}
-    
+
+    if not data:
+        return jsonify({
+            "status": "fail",
+            "msg": "Request body is empty"
+        }), 400
+
     student = db.session.execute(
         db.select(Student).where(Student.user_id == user_id)
-        ).scalar_one_or_none()
-    
+    ).scalar_one_or_none()
+
     if not student:
         return jsonify({
             "status": "fail",
-            "msg": "Student not found"            
+            "msg": "Student not found"
         }), 404
 
     allowed_fields = [
@@ -85,19 +91,26 @@ def edit_profile():
         "grade_level"
     ]
 
+    for field in data:
+        if field not in allowed_fields:
+            return jsonify({
+                "status": "fail",
+                "msg": f"{field} is not allowed to be updated"
+            }), 400
+
     for field in allowed_fields:
         if field in data:
 
             if data[field] is None or str(data[field]).strip() == "":
                 return jsonify({
                     "status": "fail",
-                    "msg": f"{field} cannot be empty".title()
+                    "msg": f"{field} cannot be empty"
                 }), 400
 
             setattr(student, field, data[field])
 
     db.session.commit()
-    
+
     return jsonify({
         "status": "success",
         "msg": "Profile updated successfully"
