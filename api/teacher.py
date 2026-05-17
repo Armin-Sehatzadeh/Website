@@ -75,14 +75,39 @@ def edit_profile():
 
     data = request.get_json() or {}
 
+    if not data:
+        return jsonify({
+            "status": "fail",
+            "msg": "Request body is empty"
+        }), 400
+
     allowed = ["phone_number", "birth_date", "address"]
 
+    # check invalid fields
+    for field in data:
+        if field not in allowed:
+            return jsonify({
+                "status": "fail",
+                "msg": f"{field} is not allowed to be updated"
+            }), 400
+
     for field in allowed:
-        if field in data and data[field]:
+        if field in data:
+
+            if data[field] is None or str(data[field]).strip() == "":
+                return jsonify({
+                    "status": "fail",
+                    "msg": f"{field} cannot be empty"
+                }), 400
+
             setattr(teacher, field, data[field])
 
     db.session.commit()
-    return jsonify({"status": "success", "msg": "Profile updated"}), 200
+
+    return jsonify({
+        "status": "success",
+        "msg": "Profile updated"
+    }), 200
 
 
 # GET STUDENTS
