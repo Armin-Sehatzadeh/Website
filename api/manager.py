@@ -37,23 +37,41 @@ def manager_profile():
 @jwt_required()
 @role_required("manager")
 def edit_profile():
-    
+
     manager = get_current_manager()
     if not manager:
         return jsonify({"msg": "Manager not found"}), 404
 
     data = request.get_json()
     if not data:
-        return jsonify({"msg": "Data not found"}), 400
-    
+        return jsonify({"msg": "Request body is empty"}), 400
+
     allowed = ["phone_number", "address"]
+
+    for field in data:
+        if field not in allowed:
+            return jsonify({
+                "status": "fail",
+                "msg": f"{field} is not allowed to be updated"
+            }), 400
 
     for field in allowed:
         if field in data:
+
+            if data[field] is None or str(data[field]).strip() == "":
+                return jsonify({
+                    "status": "fail",
+                    "msg": f"{field} cannot be empty"
+                }), 400
+
             setattr(manager, field, data[field])
 
     db.session.commit()
-    return jsonify({"msg": "Profile updated"}), 200
+
+    return jsonify({
+        "status": "success",
+        "msg": "Profile updated"
+    }), 200
 
 
 # EDIT TEACHER PROFILE
