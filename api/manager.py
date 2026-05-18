@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from decorators import role_required
 from database import db, Manager, Student, Teacher
 
-manager_bp = Blueprint("manager_bp", __name__, url_prefix="/api/manager")
+manager_bp = Blueprint("manager_bp", __name__)
 
 def get_current_manager():
     user_id = get_jwt_identity()
@@ -166,12 +166,17 @@ def edit_student(student_id):
 def assign_student():
 
     data = request.get_json()
-    
     if not data:
         return jsonify({"status": "fail", "msg": "No data provided"}), 400
 
-    student = db.session.get(Student, data.get("student_id"))
-    teacher = db.session.get(Teacher, data.get("teacher_id"))
+    student_id = data.get("student_id")
+    teacher_id = data.get("teacher_id")
+
+    if not student_id or not teacher_id:
+        return jsonify({"status": "fail", "msg": "student_id and teacher_id required"}), 400
+
+    student = db.session.get(Student, student_id)
+    teacher = db.session.get(Teacher, teacher_id)
 
     if not student or not teacher:
         return jsonify({"status": "fail", "msg": "Student or Teacher not found"}), 404

@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from database import db, Student
 from decorators import role_required
 
-student_bp = Blueprint("student_bp", __name__, url_prefix="/api/student")
+student_bp = Blueprint("student_bp", __name__)
 
 
 # GET SCORE

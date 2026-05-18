@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from database import db, Teacher, Student
 from decorators import role_required
 
-teacher_bp = Blueprint("teacher_bp", __name__, url_prefix="/api/teacher")
+teacher_bp = Blueprint("teacher_bp", __name__)
 
 
 def get_current_teacher():
