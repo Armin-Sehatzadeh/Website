@@ -166,6 +166,9 @@ def edit_student(student_id):
 def assign_student():
 
     data = request.get_json()
+    
+    if not data:
+        return jsonify({"msg": "No data provided"}), 400
 
     student = db.session.get(Student, data.get("student_id"))
     teacher = db.session.get(Teacher, data.get("teacher_id"))
@@ -200,7 +203,6 @@ def get_students():
         })
 
     return jsonify(result), 200
-
 
 
 # GET TEACHER LIST
