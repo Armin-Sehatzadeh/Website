@@ -90,9 +90,24 @@ def edit_teacher(teacher_id):
 
     allowed = ["phone_number", "address"]
 
+    for field in data:
+        if field not in allowed:
+            return jsonify({
+                "status": "fail",
+                "msg": f"{field} is not allowed to be updated"
+            }), 400
+
     for field in allowed:
         if field in data:
+
+            if data[field] is None or str(data[field]).strip() == "":
+                return jsonify({
+                    "status": "fail",
+                    "msg": f"{field} cannot be empty"
+                }), 400
+
             setattr(teacher, field, data[field])
+    
 
     db.session.commit()
     return jsonify({"msg": "Teacher updated"}), 200
@@ -121,8 +136,22 @@ def edit_student(student_id):
         "score"
     ]
 
+    for field in data:
+        if field not in allowed:
+            return jsonify({
+                "status": "fail",
+                "msg": f"{field} is not allowed to be updated"
+            }), 400
+
     for field in allowed:
         if field in data:
+
+            if data[field] is None or str(data[field]).strip() == "":
+                return jsonify({
+                    "status": "fail",
+                    "msg": f"{field} cannot be empty"
+                }), 400
+
             setattr(student, field, data[field])
 
     db.session.commit()
