@@ -21,7 +21,7 @@ def manager_profile():
     
     manager = get_current_manager()
     if not manager:
-        return jsonify({"msg": "Manager not found"}), 404
+        return jsonify({"status": "fail", "msg": "Manager not found"}), 404
 
     return jsonify({
         "first_name": manager.user.first_name,
@@ -40,11 +40,11 @@ def edit_profile():
 
     manager = get_current_manager()
     if not manager:
-        return jsonify({"msg": "Manager not found"}), 404
+        return jsonify({"status": "fail", "msg": "Manager not found"}), 404
 
     data = request.get_json()
     if not data:
-        return jsonify({"msg": "Request body is empty"}), 400
+        return jsonify({"status": "fail", "msg": "Request body is empty"}), 400
 
     allowed = ["phone_number", "address"]
 
@@ -82,11 +82,11 @@ def edit_teacher(teacher_id):
 
     teacher = db.session.get(Teacher, teacher_id)
     if not teacher:
-        return jsonify({"msg": "Teacher not found"}), 404
+        return jsonify({"status": "fail", "msg": "Teacher not found"}), 404
     
     data = request.get_json()
     if not data:
-        return jsonify({"msg": "No data provided"}), 400
+        return jsonify({"status": "fail", "msg": "No data provided"}), 400
 
     allowed = ["phone_number", "address"]
 
@@ -110,7 +110,7 @@ def edit_teacher(teacher_id):
     
 
     db.session.commit()
-    return jsonify({"msg": "Teacher updated"}), 200
+    return jsonify({"status":"success", "msg": "Teacher updated"}), 200
 
 
 # EDIT STUDENT PROFILE
@@ -122,11 +122,11 @@ def edit_student(student_id):
     student = db.session.get(Student, student_id)
 
     if not student:
-        return jsonify({"msg": "Student not found"}), 404
+        return jsonify({"status": "fail", "msg": "Student not found"}), 404
 
     data = request.get_json()
     if not data:
-        return jsonify({"msg": "No data provided"}), 400
+        return jsonify({"status": "fail", "msg": "No data provided"}), 400
 
     allowed = [
         "phone_number",
@@ -156,7 +156,7 @@ def edit_student(student_id):
 
     db.session.commit()
 
-    return jsonify({"msg": "Student updated"}), 200
+    return jsonify({"status": "success", "msg": "Student updated"}), 200
 
 
 # ASSIGN STUDENT TO TEACHER
@@ -168,19 +168,19 @@ def assign_student():
     data = request.get_json()
     
     if not data:
-        return jsonify({"msg": "No data provided"}), 400
+        return jsonify({"status": "fail", "msg": "No data provided"}), 400
 
     student = db.session.get(Student, data.get("student_id"))
     teacher = db.session.get(Teacher, data.get("teacher_id"))
 
     if not student or not teacher:
-        return jsonify({"msg": "Student or Teacher not found"}), 404
+        return jsonify({"status": "fail", "msg": "Student or Teacher not found"}), 404
 
     student.teacher_id = teacher.id
 
     db.session.commit()
 
-    return jsonify({"msg": "Student assigned"}), 200
+    return jsonify({"status": "success", "msg": "Student assigned"}), 200
 
 
 # GET STUDENTS LIST
