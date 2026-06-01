@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ثبت‌نام | EduPanel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0e1a; --card: #161d2e; --border: rgba(99,179,237,0.12);
+      --accent: #3b82f6; --accent2: #8b5cf6; --accent3: #06b6d4;
+      --text: #f1f5f9; --muted: #94a3b8; --error: #f87171; --success: #34d399;
+    }
+    body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    .bg-grid { position: fixed; inset: 0; z-index: 0; background-image: linear-gradient(rgba(139,92,246,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.04) 1px,transparent 1px); background-size: 60px 60px; }
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+    .orb1 { width: 500px; height: 500px; background: radial-gradient(circle,rgba(139,92,246,0.2),transparent); top: -100px; left: -100px; }
+    .orb2 { width: 350px; height: 350px; background: radial-gradient(circle,rgba(6,182,212,0.15),transparent); bottom: 0; right: -80px; }
+
+    nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 18px 48px; border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); background: rgba(10,14,26,0.6); }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+    .logo-icon { width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(135deg,var(--accent),var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+    .logo-text { font-size: 17px; font-weight: 700; }
+    .nav-link { color: var(--muted); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+    .nav-link:hover { color: var(--text); }
+    .nav-link span { color: var(--accent2); }
+
+    main { position: relative; z-index: 1; flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 40px 20px 60px; }
+
+    .register-box {
+      width: 100%; max-width: 520px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+      padding: 48px 40px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+      animation: slideUp 0.6s ease both;
+    }
+    @keyframes slideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+    .reg-header { text-align: center; margin-bottom: 32px; }
+    .reg-icon { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 18px; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .reg-header h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; }
+    .reg-header p { color: var(--muted); font-size: 0.88rem; }
+
+    /* Role Tabs */
+    .role-tabs { display: flex; gap: 8px; margin-bottom: 28px; background: rgba(255,255,255,0.04); border-radius: 14px; padding: 5px; }
+    .role-tab { flex: 1; padding: 10px 8px; border: none; border-radius: 10px; background: transparent; color: var(--muted); font-family: 'Vazirmatn', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.25s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .role-tab.active { background: var(--card); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .role-tab[data-role="student"].active { color: var(--accent3); }
+    .role-tab[data-role="teacher"].active { color: var(--accent); }
+    .role-tab[data-role="manager"].active { color: var(--accent2); }
+
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 0.84rem; font-weight: 500; color: var(--muted); margin-bottom: 7px; }
+    .req { color: var(--error); margin-right: 2px; }
+
+    .input-wrap { position: relative; }
+    .input-icon { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+    input, select {
+      width: 100%; padding: 12px 42px 12px 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 11px;
+      color: var(--text); font-family: 'Vazirmatn', sans-serif; font-size: 0.92rem;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+    }
+    input:focus, select:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
+    input::placeholder { color: rgba(148,163,184,0.45); }
+    select option { background: #1e293b; }
+
+    .toggle-pass { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 15px; color: var(--muted); padding: 0; }
+
+    .section-title { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin: 24px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+    .extra-field { display: none; }
+    .extra-field.visible { display: block; }
+
+    .alert { padding: 12px 16px; border-radius: 12px; font-size: 0.84rem; margin-bottom: 18px; display: none; align-items: center; gap: 8px; }
+    .alert-error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+    .alert-success { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
+    .alert.show { display: flex; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .btn-submit {
+      width: 100%; padding: 14px; border-radius: 13px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #fff; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; font-weight: 700;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s; margin-top: 8px;
+    }
+    .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139,92,246,0.35); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-submit .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    .btn-submit.loading .btn-text { display: none; }
+    .btn-submit.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .login-link { text-align: center; font-size: 0.88rem; color: var(--muted); margin-top: 20px; }
+    .login-link a { color: var(--accent2); text-decoration: none; font-weight: 600; }
+    .login-link a:hover { color: var(--accent); }
+
+    .pass-hint { font-size: 0.75rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav>
+    <a href="/" class="logo">
+      <div class="logo-icon">🎓</div>
+      <span class="logo-text">EduPanel</span>
+    </a>
+    <a href="/login" class="nav-link">حساب دارید؟ <span>ورود</span></a>
+  </nav>
+
+  <main>
+    <div class="register-box">
+      <div class="reg-header">
+        <div class="reg-icon">✨</div>
+        <h1>ایجاد حساب</h1>
+        <p>نقش خود را انتخاب کنید و ثبت‌نام کنید.</p>
+      </div>
+
+      <div class="role-tabs">
+        <button class="role-tab active" data-role="student">🎒 دانش‌آموز</button>
+        <button class="role-tab" data-role="teacher">📚 معلم</button>
+        <button class="role-tab" data-role="manager">🏫 مدیر</button>
+      </div>
+
+      <div class="alert alert-error" id="errorAlert"><span>⚠️</span><span id="errorMsg"></span></div>
+      <div class="alert alert-success" id="successAlert"><span>✅</span><span id="successMsg">ثبت‌نام موفق! در حال انتقال...</span></div>
+
+      <form id="registerForm">
+        <p class="section-title">اطلاعات پایه</p>
+        <div class="row2">
+          <div class="form-group">
+            <label>نام <span class="req">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text" id="first_name" placeholder="نام" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>نام خانوادگی <span class="req">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text" id="last_name" placeholder="نام خانوادگی" required/>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>ایمیل <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📧</span>
+            <input type="email" id="email" placeholder="example@email.com" required/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>رمز عبور <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🔑</span>
+            <input type="password" id="password" placeholder="حداقل ۸ کاراکتر" required/>
+            <button type="button" class="toggle-pass" id="togglePass">👁️</button>
+          </div>
+          <div class="pass-hint">باید شامل حروف بزرگ، کوچک، عدد و کاراکتر خاص باشد.</div>
+        </div>
+
+        <p class="section-title">اطلاعات تکمیلی</p>
+        <div class="row2">
+          <div class="form-group">
+            <label>شماره تلفن</label>
+            <div class="input-wrap">
+              <span class="input-icon">📱</span>
+              <input type="text" id="phone_number" placeholder="09xxxxxxxxx"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>تاریخ تولد</label>
+            <div class="input-wrap">
+              <span class="input-icon">📅</span>
+              <input type="date" id="birth_date"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>آدرس</label>
+          <div class="input-wrap">
+            <span class="input-icon">📍</span>
+            <input type="text" id="address" placeholder="آدرس کامل"/>
+          </div>
+        </div>
+
+        <!-- student fields -->
+        <div class="form-group extra-field student-field visible" id="gradeLevelGroup">
+          <label>پایه تحصیلی <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">📊</span>
+            <select id="grade_level">
+              <option value="">انتخاب پایه</option>
+              <option value="1">اول</option><option value="2">دوم</option>
+              <option value="3">سوم</option><option value="4">چهارم</option>
+              <option value="5">پنجم</option><option value="6">ششم</option>
+              <option value="7">هفتم</option><option value="8">هشتم</option>
+              <option value="9">نهم</option><option value="10">دهم</option>
+              <option value="11">یازدهم</option><option value="12">دوازدهم</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- teacher fields -->
+        <div class="form-group extra-field teacher-field" id="managerIdGroup">
+          <label>شناسه مدیر <span class="req">*</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🏫</span>
+            <input type="number" id="manager_id" placeholder="شناسه مدیر مربوطه"/>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-text">ثبت‌نام</span>
+          <span class="spinner"></span>
+        </button>
+      </form>
+
+      <div class="login-link">حساب دارید؟ <a href="/login">ورود کنید</a></div>
+    </div>
+  </main>
+
+  <script>
+    const API = '/api/auth';
+    let selectedRole = 'student';
+
+    // Role tabs
+    document.querySelectorAll('.role-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        selectedRole = tab.dataset.role;
+        updateFields();
+      });
+    });
+
+    function updateFields() {
+      document.querySelectorAll('.student-field').forEach(el => el.classList.toggle('visible', selectedRole === 'student'));
+      document.querySelectorAll('.teacher-field').forEach(el => el.classList.toggle('visible', selectedRole === 'teacher'));
+
+      document.getElementById('grade_level').required = (selectedRole === 'student');
+      document.getElementById('manager_id').required = (selectedRole === 'teacher');
+    }
+
+    document.getElementById('togglePass').addEventListener('click', function() {
+      const inp = document.getElementById('password');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      this.textContent = inp.type === 'password' ? '👁️' : '🙈';
+    });
+
+    function showError(msg) {
+      document.getElementById('errorMsg').textContent = msg;
+      document.getElementById('errorAlert').classList.add('show');
+      document.getElementById('successAlert').classList.remove('show');
+    }
+    function showSuccess(msg) {
+      if (msg) document.getElementById('successMsg').textContent = msg;
+      document.getElementById('successAlert').classList.add('show');
+      document.getElementById('errorAlert').classList.remove('show');
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.classList.add('loading'); btn.disabled = true;
+
+      const body = {
+        first_name: document.getElementById('first_name').value.trim(),
+        last_name: document.getElementById('last_name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+        role: selectedRole,
+        phone_number: document.getElementById('phone_number').value.trim() || null,
+        birth_date: document.getElementById('birth_date').value || null,
+        address: document.getElementById('address').value.trim() || null,
+      };
+
+      if (selectedRole === 'student') {
+        const gl = document.getElementById('grade_level').value;
+        if (!gl) { showError('لطفاً پایه تحصیلی را انتخاب کنید.'); btn.classList.remove('loading'); btn.disabled = false; return; }
+        body.grade_level = parseInt(gl);
+      }
+      if (selectedRole === 'teacher') {
+        const mid = document.getElementById('manager_id').value;
+        if (!mid) { showError('لطفاً شناسه مدیر را وارد کنید.'); btn.classList.remove('loading'); btn.disabled = false; return; }
+        body.manager_id = parseInt(mid);
+      }
+
+      try {
+        const res = await fetch(`${API}/sign-in`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showSuccess('ثبت‌نام موفق! به صفحه ورود منتقل می‌شوید...');
+          setTimeout(() => window.location.href = '/login', 1500);
+        } else {
+          showError(data.msg || 'خطایی رخ داد.');
+        }
+      } catch {
+        showError('خطا در اتصال به سرور.');
+      } finally {
+        btn.classList.remove('loading'); btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
