@@ -21,3 +21,26 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Environment variables (بسیار مهم: فایل پسوردها نباید در گیت باشد)
+.env
+
+# Database (دیتابیس محلی نباید آپلود شود)
+*.db
+*.sqlite3
+
+# VS Code & IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Flask
+instance/
+.webassets-cache
