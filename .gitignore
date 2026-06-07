@@ -1,38 +1,18 @@
-### AL ###
-#Template for AL projects for Dynamics 365 Business Central
-#launch.json folder
-.vscode/
-#Cache folder
-.alcache/
-#Symbols folder
-.alpackages/
-#Snapshots folder
-.snapshots/
-#Testing Output folder
-.output/
-#Extension App-file
-*.app
-#Rapid Application Development File
-rad.json
-#Translation Base-file
-*.g.xlf
-#License-files
-*.bclicense
-*.flf
-#Test results file
-TestResults.xml
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Virtual Environments
 venv/
 .venv/
 env/
+venv_clean/
 
-# Environment variables (بسیار مهم: فایل پسوردها نباید در گیت باشد)
+# Environment variables
 .env
 
-# Database (دیتابیس محلی نباید آپلود شود)
+# Database
 *.db
 *.sqlite3
 
