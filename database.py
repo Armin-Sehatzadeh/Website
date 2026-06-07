@@ -36,7 +36,7 @@ class Teacher(db.Model):
     manager_id: Mapped[int] = mapped_column(ForeignKey("managers.id"))
     phone_number: Mapped[str] = mapped_column(String(20))
     birth_date: Mapped[date] = mapped_column(Date)
-    address: Mapped[str] = mapped_column(String(255))
+    address: Mapped[str] = mapped_column(String(255), nullable=True)
 
     user = relationship("User", back_populates="teacher")
     students = relationship("Student", back_populates="teacher")
@@ -53,8 +53,8 @@ class Student(db.Model):
     manager_id: Mapped[int] = mapped_column(ForeignKey("managers.id"), nullable=True)
     phone_number: Mapped[str] = mapped_column(String(20))
     birth_date: Mapped[date] = mapped_column(Date)
-    address: Mapped[str] = mapped_column(String(255))
-    score: Mapped[float] = mapped_column(Float)
+    address: Mapped[str] = mapped_column(String(255), nullable=True)
+    score: Mapped[float] = mapped_column(Float, nullable=True)
     grade_level: Mapped[int] = mapped_column(Integer, nullable=False)
 
     user = relationship("User", back_populates="student")
@@ -70,7 +70,7 @@ class Manager(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True, nullable=False)
     phone_number: Mapped[str] = mapped_column(String(20))
     birth_date: Mapped[date] = mapped_column(Date)
-    address: Mapped[str] = mapped_column(String(255))
+    address: Mapped[str] = mapped_column(String(255), nullable=True)
     
     user = relationship("User", back_populates="manager")
     teachers = relationship("Teacher", back_populates="manager")
