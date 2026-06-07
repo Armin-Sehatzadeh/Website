@@ -2,11 +2,10 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from database import db, Student
 from decorators import role_required
+from datetime import datetime
 
 student_bp = Blueprint("student_bp", __name__)
 
-
-# GET SCORE
 @student_bp.get("/score")
 @jwt_required()
 @role_required("student")
@@ -31,40 +30,37 @@ def get_score():
     }), 200
 
 
-# STUDENT PROFILE INFO
 @student_bp.get("/profile")
 @jwt_required()
 @role_required("student")
 def student_profile():
-    
     user_id = get_jwt_identity()
+
     student = db.session.execute(
         db.select(Student).where(Student.user_id == user_id)
-        ).scalar_one_or_none() 
-    
+    ).scalar_one_or_none()
+
     if not student:
         return jsonify({
             "status": "fail",
-            "msg": "Student not found"            
+            "msg": "Student not found"
         }), 404
 
     return jsonify({
         "first_name": student.user.first_name,
-        "last_name": student.user.last_name,       
+        "last_name": student.user.last_name,
         "phone_number": student.phone_number,
         "birth_date": str(student.birth_date),
         "address": student.address,
         "grade_level": student.grade_level,
         "score": student.score
     }), 200
-    
-    
-# EDIT STUDENT PROFILE    
+
+
 @student_bp.patch("/profile")
 @jwt_required()
 @role_required("student")
 def edit_profile():
-
     user_id = get_jwt_identity()
     data = request.get_json() or {}
 
@@ -100,14 +96,24 @@ def edit_profile():
 
     for field in allowed_fields:
         if field in data:
-
             if data[field] is None or str(data[field]).strip() == "":
                 return jsonify({
                     "status": "fail",
                     "msg": f"{field} cannot be empty"
                 }), 400
 
-            setattr(student, field, data[field])
+            value = data[field]
+
+            if field == "birth_date":
+                try:
+                    value = datetime.strptime(value, "%Y-%m-%d").date()
+                except ValueError:
+                    return jsonify({
+                        "status": "fail",
+                        "msg": "birth_date format must be YYYY-MM-DD"
+                    }), 400
+
+            setattr(student, field, value)
 
     db.session.commit()
 
