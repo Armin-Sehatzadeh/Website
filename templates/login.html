@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ورود | EduPanel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0e1a; --surface: #111827; --card: #161d2e;
+      --border: rgba(99,179,237,0.12); --accent: #3b82f6; --accent2: #06b6d4;
+      --text: #f1f5f9; --muted: #94a3b8; --error: #f87171; --success: #34d399;
+    }
+
+    body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+
+    .bg-grid { position: fixed; inset: 0; z-index: 0; background-image: linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px); background-size: 60px 60px; }
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+    .orb1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(59,130,246,0.2), transparent); top: -100px; right: -100px; }
+    .orb2 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(6,182,212,0.15), transparent); bottom: -50px; left: -80px; }
+
+    nav {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px; border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px); background: rgba(10,14,26,0.6);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+    .logo-icon { width: 36px; height: 36px; border-radius: 9px; background: linear-gradient(135deg, var(--accent), #8b5cf6); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+    .logo-text { font-size: 17px; font-weight: 700; }
+    .nav-link { color: var(--muted); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+    .nav-link:hover { color: var(--text); }
+    .nav-link span { color: var(--accent); }
+
+    main {
+      position: relative; z-index: 1; flex: 1;
+      display: flex; align-items: center; justify-content: center; padding: 40px 20px;
+    }
+
+    .login-box {
+      width: 100%; max-width: 440px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+      padding: 48px 40px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+      animation: slideUp 0.6s ease both;
+    }
+    @keyframes slideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+    .login-header { text-align: center; margin-bottom: 36px; }
+    .login-icon {
+      width: 64px; height: 64px; margin: 0 auto 16px;
+      border-radius: 18px; background: rgba(59,130,246,0.15);
+      border: 1px solid rgba(59,130,246,0.3);
+      display: flex; align-items: center; justify-content: center; font-size: 28px;
+    }
+    .login-header h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 8px; }
+    .login-header p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
+
+    .input-wrap { position: relative; }
+    .input-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+    input {
+      width: 100%; padding: 13px 44px 13px 16px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px;
+      color: var(--text); font-family: 'Vazirmatn', sans-serif; font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+    }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+    input::placeholder { color: rgba(148,163,184,0.5); }
+
+    .toggle-pass { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; color: var(--muted); padding: 0; transition: color 0.2s; }
+    .toggle-pass:hover { color: var(--text); }
+
+    .alert {
+      padding: 12px 16px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 20px;
+      display: none; align-items: center; gap: 8px;
+    }
+    .alert-error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--error); }
+    .alert-success { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
+    .alert.show { display: flex; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .btn-submit {
+      width: 100%; padding: 14px; border-radius: 13px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-family: 'Vazirmatn', sans-serif; font-size: 1rem; font-weight: 700;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s; margin-top: 8px;
+      position: relative; overflow: hidden;
+    }
+    .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(59,130,246,0.35); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-submit .spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    .btn-submit.loading .btn-text { display: none; }
+    .btn-submit.loading .spinner { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .divider { text-align: center; margin: 24px 0; position: relative; }
+    .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); }
+    .divider span { position: relative; padding: 0 12px; background: var(--card); color: var(--muted); font-size: 0.8rem; }
+
+    .register-link { text-align: center; font-size: 0.88rem; color: var(--muted); }
+    .register-link a { color: var(--accent); text-decoration: none; font-weight: 600; transition: color 0.2s; }
+    .register-link a:hover { color: var(--accent2); }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <nav>
+    <a href="/" class="logo">
+      <div class="logo-icon">🎓</div>
+      <span class="logo-text">EduPanel</span>
+    </a>
+    <a href="/register" class="nav-link">حساب ندارید؟ <span>ثبت‌نام</span></a>
+  </nav>
+
+  <main>
+    <div class="login-box">
+      <div class="login-header">
+        <div class="login-icon">🔐</div>
+        <h1>خوش برگشتید!</h1>
+        <p>برای ورود به پنل، ایمیل و رمز عبور خود را وارد کنید.</p>
+      </div>
+
+      <div class="alert alert-error" id="errorAlert">
+        <span>⚠️</span><span id="errorMsg">خطایی رخ داد</span>
+      </div>
+      <div class="alert alert-success" id="successAlert">
+        <span>✅</span><span>ورود موفق! در حال انتقال...</span>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">ایمیل</label>
+          <div class="input-wrap">
+            <span class="input-icon">📧</span>
+            <input type="email" id="email" placeholder="example@email.com" autocomplete="email" required/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">رمز عبور</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔑</span>
+            <input type="password" id="password" placeholder="رمز عبور خود را وارد کنید" required/>
+            <button type="button" class="toggle-pass" id="togglePass">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span class="btn-text">ورود به حساب</span>
+          <span class="spinner"></span>
+        </button>
+      </form>
+
+      <div class="divider"><span>یا</span></div>
+      <div class="register-link">حساب ندارید؟ <a href="/register">همین‌جا ثبت‌نام کنید</a></div>
+    </div>
+  </main>
+
+  <script>
+    const API = '/api/auth';
+
+    document.getElementById('togglePass').addEventListener('click', function() {
+      const inp = document.getElementById('password');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      this.textContent = inp.type === 'password' ? '👁️' : '🙈';
+    });
+
+    function showError(msg) {
+      document.getElementById('errorMsg').textContent = msg;
+      document.getElementById('errorAlert').classList.add('show');
+      document.getElementById('successAlert').classList.remove('show');
+    }
+    function showSuccess() {
+      document.getElementById('successAlert').classList.add('show');
+      document.getElementById('errorAlert').classList.remove('show');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.classList.add('loading'); btn.disabled = true;
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch(`${API}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          showSuccess();
+          setTimeout(() => {
+            const role = data.user.role;
+            if (role === 'student') window.location.href = '/student-dashboard';
+            else if (role === 'teacher') window.location.href = '/teacher-dashboard';
+            else if (role === 'manager') window.location.href = '/manager-dashboard';
+          }, 1200);
+        } else {
+          showError(data.msg || 'ایمیل یا رمز عبور اشتباه است.');
+        }
+      } catch {
+        showError('خطا در اتصال به سرور. لطفاً دوباره تلاش کنید.');
+      } finally {
+        btn.classList.remove('loading'); btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
