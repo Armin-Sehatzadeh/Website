@@ -1,0 +1,10 @@
+
+*.* linguist-language=Python
+
+templates/ linguist-vendored=true
+static/ linguist-vendored=true
+
+*.py linguist-language=Python
+*.html linguist-vendored=true
+*.css linguist-vendored=true
+*.js linguist-vendored=true
